@@ -5,45 +5,46 @@
 #define pb push_back
 #define endl '\n'
 #define pi 3.1415926536
-#define inf 1e15
 using namespace std;
 
-vector<vector<pair<ll,int>>>adj(100007);
-ll dist[100007],arr[100007];
-bool vis[100007];
+vector<vector<pair<int,int>>>adj(100001);
+
 void dijkstra(int src, int n){
     
-    priority_queue<pair<ll,int>, vector<pair<ll,int>>, greater<pair<ll,int>>>pq;
+    priority_queue<pair<int,int>, vector<pair<int,int>>, greater<pair<int,int>>>pq;
+    
+    vector<pair<int,int>> dist(n+1);
     for(int i=1;i<=n;i++){
-        dist[i]=inf;
+        dist[i]=mp(INT_MAX,-1);
+        pq.push(mp(dist[i].first,i));
     }
-    dist[src]=0;
-    arr[src]=-1;
-    pq.push(mp(0,src));
+    dist[src]=mp(0,src);
+    pq.push(mp(dist[src].first,src));
+    
     while(!pq.empty()){ 
         int u=pq.top().second;
         pq.pop();
-        vis[u]=true;
         for(int j=0;j<adj[u].size();j++){
             int v=adj[u][j].first;
             int w=adj[u][j].second;
-            if(!vis[v] && dist[v]>dist[u]+w){
-                dist[v]=dist[u]+w;
-                arr[v]=u;
-                pq.push(mp(dist[v],v));
+            if( dist[v].first>dist[u].first+w){
+                dist[v]=mp(dist[u].first+w,u);
+                pq.push(mp(dist[v].first,v));
             }
         }
         
     }
     
-    if(dist[n]>=inf)cout<<-1;
+    if(dist[n].first==INT_MAX)cout<<-1;
     else{
         int i=n;
         vector<int>ans;
-        while(i!=-1){
-            ans.pb(i);
-            i=arr[i];
+        ans.pb(n);
+        while(dist[i].second!=src){
+            ans.pb(dist[i].second);
+            i=dist[i].second;
         }
+        cout<<1<<" ";
         for(int i=ans.size()-1;i>=0;i--)cout<<ans[i]<<" ";
     }
     
@@ -58,8 +59,7 @@ int main()
     cin>>n>>m;
     
     for(int i=0;i<m;i++){
-        int x,y;
-        ll w;
+        int x,y,w;
         cin>>x>>y>>w;
         adj[x].pb(mp(y,w));
         adj[y].pb(mp(x,w));
